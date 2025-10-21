@@ -6,20 +6,20 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "VapeEd - Learn About Vaping",
+  title: "LyfeLine - Learn About Vaping",
   description: "Gamified vape education with lessons, quizzes, and rewards",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "VapeEd",
+    title: "LyfeLine",
   },
   formatDetection: {
     telephone: false,
   },
   icons: {
-    icon: "/icon-192.jpg",
-    apple: "/icon-192.jpg",
+    icon: "/favicon.png",
+    apple: "/favicon.png",
   },
     generator: 'v0.app'
 }
@@ -37,8 +37,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="VapeEd" />
-        <link rel="apple-touch-icon" href="/icon-192.jpg" />
+        <meta name="apple-mobile-web-app-title" content="LyfeLine" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
       </head>
       <body className={inter.className}>{children}</body>
     </html>

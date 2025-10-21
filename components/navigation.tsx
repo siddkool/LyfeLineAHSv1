@@ -16,7 +16,7 @@ export function Navigation() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 border-t bg-card/95 backdrop-blur-sm z-50 md:hidden shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 border-t bg-card/95 backdrop-blur-sm z-50 shadow-lg">
       <div className="flex items-center justify-around p-2">
         {links.map((link) => {
           const Icon = link.icon
