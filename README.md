@@ -1,30 +1,9 @@
-# Vape education app
+# LyfeLineAHSv1
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+A program I developed for my high school (Allen High School) to educate all 5000 students about vaping, its harmful side effects, and other dangers of nicotine. 
+Worked with the principal and district coordinator to launch it full-time at the only high school in our city, allowing students of all ages to get real-time education on what these harmful substances can do to them.
+Provides a gamified learning experience, as reading lessons and completing quizzes allows students to earn points which can be redeemed for MINGA points, used during priority for course scheduling, final exam exemptions, and much more!
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/sidkoolkarni-4355s-projects/v0-vape-education-app)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/ZDDhwygDzpa)
+View the program:
+**[HERE](lyfelineahsprogram.vercel.app)**
 
-## Overview
-
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
-
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/sidkoolkarni-4355s-projects/v0-vape-education-app](https://vercel.com/sidkoolkarni-4355s-projects/v0-vape-education-app)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/projects/ZDDhwygDzpa](https://v0.app/chat/projects/ZDDhwygDzpa)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
