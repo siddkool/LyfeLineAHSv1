@@ -5,5 +5,5 @@ Worked with the principal and district coordinator to launch it full-time at the
 Provides a gamified learning experience, as reading lessons and completing quizzes allows students to earn points which can be redeemed for MINGA points, used during priority for course scheduling, final exam exemptions, and much more!
 
 View the program:
-**[HERE](lyfelineahsprogram.vercel.app)**
+[HERE](lyfelineahsprogram.vercel.app)
 
