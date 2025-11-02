@@ -13,6 +13,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { getSupabase } from "@/lib/supabase/client"
 import type { User } from "@/lib/types"
+import { getRankInfo } from "@/lib/utils/ranks"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -86,25 +87,7 @@ export default function ProfilePage() {
       ? Math.round(scores.reduce((sum, scoreObj) => sum + (scoreObj.score / scoreObj.total) * 100, 0) / scores.length)
       : 0
 
-  // Determine rank based on points
-  let rank = "Beginner"
-  let nextRank = "Explorer"
-  let pointsToNext = 500
-  if (progress.totalPoints >= 2000) {
-    rank = "Master"
-    nextRank = "Legend"
-    pointsToNext = 5000 - progress.totalPoints
-  } else if (progress.totalPoints >= 1000) {
-    rank = "Expert"
-    nextRank = "Master"
-    pointsToNext = 2000 - progress.totalPoints
-  } else if (progress.totalPoints >= 500) {
-    rank = "Explorer"
-    nextRank = "Expert"
-    pointsToNext = 1000 - progress.totalPoints
-  } else {
-    pointsToNext = 500 - progress.totalPoints
-  }
+  const rankInfo = getRankInfo(progress.totalPoints)
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -156,53 +139,94 @@ export default function ProfilePage() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Current Rank</div>
-                  <div className="text-4xl font-bold text-primary">{rank}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl">{rankInfo.icon}</span>
+                    <span className={`text-4xl font-bold ${rankInfo.color}`}>{rankInfo.rank}</span>
+                  </div>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <Award className="w-6 h-6 text-primary" />
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Next: {nextRank}</span>
-                  <span className="font-medium">{pointsToNext} pts to go</span>
+              {rankInfo.rank !== "Legend" && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Next: {rankInfo.nextRank}</span>
+                    <span className="font-medium">{rankInfo.pointsToNext} pts to go</span>
+                  </div>
+                  <Progress value={rankInfo.progress} />
                 </div>
-                <Progress value={Math.min(100, ((progress.totalPoints % 1000) / 1000) * 100)} />
-              </div>
+              )}
+              {rankInfo.rank === "Legend" && (
+                <div className="text-center py-2">
+                  <p className="text-sm text-muted-foreground">🎉 You've reached the highest rank!</p>
+                </div>
+              )}
             </Card>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid sm:grid-cols-3 gap-6">
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <BookOpen className="w-5 h-5 text-secondary" />
-                <div className="text-sm text-muted-foreground">Lessons Completed</div>
+          <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-2">
+            <h2 className="text-lg font-semibold mb-6">Your Statistics</h2>
+            <div className="grid sm:grid-cols-3 gap-6">
+              {/* Lessons Completed */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-5 h-5 text-secondary" />
+                  </div>
+                  <div className="text-sm font-medium text-muted-foreground">Lessons Completed</div>
+                </div>
+                <div className="text-3xl font-bold">
+                  {completedCount}
+                  <span className="text-xl text-muted-foreground font-normal">/{totalLessons}</span>
+                </div>
+                <div className="space-y-1.5">
+                  <Progress value={completionPercent} className="h-2 bg-secondary/20" />
+                  <div className="text-xs text-muted-foreground">{completionPercent}% complete</div>
+                </div>
               </div>
-              <div className="text-3xl font-bold">
-                {completedCount}/{totalLessons}
-              </div>
-              <Progress value={completionPercent} className="mt-3" />
-            </Card>
 
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Target className="w-5 h-5 text-primary" />
-                <div className="text-sm text-muted-foreground">Average Score</div>
+              {/* Average Score */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Target className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="text-sm font-medium text-muted-foreground">Average Score</div>
+                </div>
+                <div className="text-3xl font-bold">
+                  {averageScore}
+                  <span className="text-xl text-muted-foreground font-normal">%</span>
+                </div>
+                <div className="space-y-1.5">
+                  <Progress value={averageScore} className="h-2 bg-primary/20" />
+                  <div className="text-xs text-muted-foreground">
+                    {scores.length} {scores.length === 1 ? "quiz" : "quizzes"} taken
+                  </div>
+                </div>
               </div>
-              <div className="text-3xl font-bold">{averageScore}%</div>
-              <Progress value={averageScore} className="mt-3" />
-            </Card>
 
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="w-5 h-5 text-accent" />
-                <div className="text-sm text-muted-foreground">Current Streak</div>
+              {/* Current Streak */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-5 h-5 text-accent" />
+                  </div>
+                  <div className="text-sm font-medium text-muted-foreground">Current Streak</div>
+                </div>
+                <div className="text-3xl font-bold">{progress.currentStreak}</div>
+                <div className="space-y-1.5">
+                  <div className="h-2 rounded-full bg-accent/20">
+                    <div
+                      className="h-full rounded-full bg-accent transition-all"
+                      style={{ width: `${Math.min(progress.currentStreak * 10, 100)}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-muted-foreground">days in a row</div>
+                </div>
               </div>
-              <div className="text-3xl font-bold">{progress.currentStreak}</div>
-              <div className="text-sm text-muted-foreground mt-2">days in a row</div>
-            </Card>
-          </div>
+            </div>
+          </Card>
 
           {/* Category Progress */}
           <Card className="p-6">

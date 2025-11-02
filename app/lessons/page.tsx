@@ -10,6 +10,7 @@ import { LESSONS } from "@/lib/lessons-data"
 import { useUserProgress } from "@/lib/hooks/use-user-progress"
 import { Navigation } from "@/components/navigation"
 import { BookOpen, Clock, Trophy, Search, CheckCircle2 } from "lucide-react"
+import { getRankInfo } from "@/lib/utils/ranks"
 
 const CATEGORIES = [
   { id: "all", label: "All Lessons", color: "bg-primary" },
@@ -41,6 +42,7 @@ export default function LessonsPage() {
 
   const completedCount = progress?.completedLessons.length || 0
   const totalPoints = progress?.totalPoints || 0
+  const rankInfo = getRankInfo(totalPoints)
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -56,22 +58,25 @@ export default function LessonsPage() {
 
           {/* Stats */}
           {!isLoading && (
-            <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2">
-              <Card className="px-3 md:px-4 py-2 md:py-3 flex items-center gap-2 md:gap-3 flex-shrink-0 shadow-sm">
-                <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary" />
-                <div>
-                  <div className="text-xs md:text-sm text-muted-foreground">Completed</div>
-                  <div className="text-lg md:text-xl font-bold">
-                    {completedCount}/{LESSONS.length}
-                  </div>
+            <div className="grid grid-cols-3 gap-3 md:gap-4">
+              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center shadow-md hover:shadow-lg transition-shadow">
+                <CheckCircle2 className="w-8 h-8 md:w-10 md:h-10 text-green-600 mb-2" />
+                <div className="text-xs md:text-sm text-muted-foreground mb-1">Completed</div>
+                <div className="text-xl md:text-2xl font-bold">
+                  {completedCount}/{LESSONS.length}
                 </div>
               </Card>
-              <Card className="px-3 md:px-4 py-2 md:py-3 flex items-center gap-2 md:gap-3 flex-shrink-0 shadow-sm">
-                <Trophy className="w-4 h-4 md:w-5 md:h-5 text-accent" />
-                <div>
-                  <div className="text-xs md:text-sm text-muted-foreground">Total Points</div>
-                  <div className="text-lg md:text-xl font-bold">{totalPoints}</div>
-                </div>
+
+              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center shadow-md hover:shadow-lg transition-shadow">
+                <Trophy className="w-8 h-8 md:w-10 md:h-10 text-amber-500 mb-2" />
+                <div className="text-xs md:text-sm text-muted-foreground mb-1">Total Points</div>
+                <div className="text-xl md:text-2xl font-bold text-amber-600">{totalPoints}</div>
+              </Card>
+
+              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center shadow-md hover:shadow-lg transition-shadow">
+                <div className="text-2xl md:text-3xl mb-1">{rankInfo.icon}</div>
+                <div className="text-xs md:text-sm text-muted-foreground mb-1">Rank</div>
+                <div className={`text-lg md:text-xl font-bold ${rankInfo.color}`}>{rankInfo.rank}</div>
               </Card>
             </div>
           )}

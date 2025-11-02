@@ -11,6 +11,7 @@ import { useUserProgress } from "@/lib/hooks/use-user-progress"
 import { completeLesson } from "@/lib/storage"
 import { ArrowLeft, Loader2, CheckCircle2, XCircle, Trophy } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { getSupabase } from "@/lib/supabase/client"
 
 interface QuizQuestion {
   question: string
@@ -35,14 +36,31 @@ export default function QuizPage({ params }: { params: { id: string } }) {
   const [showExplanation, setShowExplanation] = useState(false)
   const [answers, setAnswers] = useState<number[]>([])
   const [isComplete, setIsComplete] = useState(false)
+  const [attemptCount, setAttemptCount] = useState(0)
 
   const lesson = LESSONS.find((l) => l.id === id)
 
   useEffect(() => {
-    if (!lesson) return
+    if (!lesson || !userId) return
 
-    const generateQuiz = async () => {
+    const loadQuizData = async () => {
       try {
+        const supabase = getSupabase()
+        const { data: quizScores, error } = await supabase
+          .from("quiz_scores")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("lesson_id", lesson.id)
+
+        if (error) {
+          console.error("[v0] Error fetching quiz attempts:", error)
+        }
+
+        const currentAttempts = quizScores?.length || 0
+        setAttemptCount(currentAttempts)
+        console.log("[v0] Current attempt count for lesson", lesson.id, ":", currentAttempts)
+
+        // Generate quiz
         const response = await fetch("/api/generate-quiz", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -63,8 +81,8 @@ export default function QuizPage({ params }: { params: { id: string } }) {
       }
     }
 
-    generateQuiz()
-  }, [lesson])
+    loadQuizData()
+  }, [lesson, userId])
 
   if (!lesson) {
     return (
@@ -107,16 +125,16 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     const correctAnswers = answers.filter((answer, index) => answer === quiz.questions[index].correctAnswer).length
     const score = Math.round((correctAnswers / quiz.questions.length) * 100)
 
-    const attemptCount = (progress.quizScores[lesson.id]?.attempts || 0) + 1
+    const newAttemptCount = attemptCount + 1
+    let maxAttempts = 5 // beginner
+    if (lesson.difficulty === "intermediate") maxAttempts = 7
+    if (lesson.difficulty === "advanced") maxAttempts = 10
 
-    // Determine max attempts based on difficulty
-    let maxAttempts = 3 // beginner
-    if (lesson.difficulty === "intermediate") maxAttempts = 4
-    if (lesson.difficulty === "advanced") maxAttempts = 5
+    console.log("[v0] Finishing quiz - Attempt", newAttemptCount, "of", maxAttempts)
 
     // Award points based on score, but only if under attempt limit
     let pointsEarned = 0
-    if (attemptCount <= maxAttempts) {
+    if (newAttemptCount <= maxAttempts) {
       if (score >= 80) {
         pointsEarned = lesson.pointsReward
       } else if (score >= 60) {
@@ -124,11 +142,14 @@ export default function QuizPage({ params }: { params: { id: string } }) {
       } else if (score >= 40) {
         pointsEarned = Math.round(lesson.pointsReward * 0.5)
       }
+      console.log("[v0] Points earned:", pointsEarned)
+    } else {
+      console.log("[v0] Max attempts reached, no points awarded")
     }
 
     await completeLesson(lesson.id, correctAnswers, quiz.questions.length, pointsEarned, userId)
 
-    // Update local state with attempt tracking
+    // Update local state
     const newProgress = {
       ...progress,
       completedLessons: progress.completedLessons.includes(lesson.id)
@@ -140,22 +161,22 @@ export default function QuizPage({ params }: { params: { id: string } }) {
           score: correctAnswers,
           total: quiz.questions.length,
           points: pointsEarned,
-          attempts: attemptCount,
         },
       },
       totalPoints: progress.totalPoints + pointsEarned,
     }
     updateProgress(newProgress)
 
+    setAttemptCount(newAttemptCount)
     setIsComplete(true)
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Generating your personalized quiz...</p>
+          <p className="text-sm sm:text-base text-muted-foreground text-pretty">Generating your personalized quiz...</p>
         </div>
       </div>
     )
@@ -163,9 +184,9 @@ export default function QuizPage({ params }: { params: { id: string } }) {
 
   if (!quiz) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Failed to load quiz</h1>
+          <h1 className="text-xl sm:text-2xl font-bold mb-4">Failed to load quiz</h1>
           <Link href={`/lessons/${id}`}>
             <Button>Back to Lesson</Button>
           </Link>
@@ -179,10 +200,9 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     const score = Math.round((correctAnswers / quiz.questions.length) * 100)
     const passed = score >= 60
 
-    const attemptCount = progress?.quizScores[lesson.id]?.attempts || 1
-    let maxAttempts = 3
-    if (lesson.difficulty === "intermediate") maxAttempts = 4
-    if (lesson.difficulty === "advanced") maxAttempts = 5
+    let maxAttempts = 5
+    if (lesson.difficulty === "intermediate") maxAttempts = 7
+    if (lesson.difficulty === "advanced") maxAttempts = 10
     const canEarnPoints = attemptCount <= maxAttempts
 
     let pointsEarned = 0
@@ -212,28 +232,32 @@ export default function QuizPage({ params }: { params: { id: string } }) {
             )}
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">{passed ? "Great Job!" : "Keep Learning!"}</h1>
-          <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-balance">
+            {passed ? "Great Job!" : "Keep Learning!"}
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mb-6 md:mb-8 leading-relaxed text-pretty">
             You scored {correctAnswers} out of {quiz.questions.length} questions correctly
           </p>
 
           <div className="bg-muted rounded-lg p-5 md:p-6 mb-6 md:mb-8">
-            <div className="text-4xl md:text-5xl font-bold mb-2">{score}%</div>
-            <div className="text-sm text-muted-foreground mb-3 md:mb-4">Your Score</div>
+            <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2">{score}%</div>
+            <div className="text-sm sm:text-base text-muted-foreground mb-3 md:mb-4">Your Score</div>
 
-            <div className="text-sm text-muted-foreground mb-2">
+            <div className="text-sm sm:text-base text-muted-foreground mb-2">
               Attempt {attemptCount} of {maxAttempts}
             </div>
 
             {pointsEarned > 0 && (
               <div className="flex items-center justify-center gap-2 text-accent">
                 <Trophy className="w-5 h-5" />
-                <span className="font-semibold">+{pointsEarned} points earned!</span>
+                <span className="text-sm sm:text-base font-semibold">+{pointsEarned} points earned!</span>
               </div>
             )}
 
             {!canEarnPoints && (
-              <div className="text-sm text-muted-foreground mt-2">Maximum attempts reached - no points awarded</div>
+              <div className="text-sm sm:text-base text-muted-foreground mt-2 text-pretty">
+                Maximum attempts reached - no points awarded
+              </div>
             )}
           </div>
 
@@ -274,17 +298,19 @@ export default function QuizPage({ params }: { params: { id: string } }) {
           </Link>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4 mb-4">
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold">{lesson.title} - Quiz</h1>
-              <p className="text-sm text-muted-foreground mt-1">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-balance leading-tight">
+                {lesson.title} - Quiz
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                 Question {currentQuestion + 1} of {quiz.questions.length}
               </p>
             </div>
-            <div className="text-left sm:text-right">
-              <div className="text-xs md:text-sm text-muted-foreground">Potential Reward</div>
+            <div className="text-left sm:text-right shrink-0">
+              <div className="text-xs sm:text-sm text-muted-foreground">Potential Reward</div>
               <div className="flex items-center gap-1 text-accent font-semibold">
                 <Trophy className="w-4 h-4" />
-                {lesson.pointsReward} pts
+                <span className="text-sm sm:text-base">{lesson.pointsReward} pts</span>
               </div>
             </div>
           </div>
@@ -297,7 +323,9 @@ export default function QuizPage({ params }: { params: { id: string } }) {
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="max-w-3xl mx-auto">
           <Card className="p-5 md:p-8">
-            <h2 className="text-lg md:text-xl font-semibold mb-5 md:mb-6 text-balance">{question.question}</h2>
+            <h2 className="text-base sm:text-lg lg:text-xl font-semibold mb-5 md:mb-6 text-balance leading-relaxed">
+              {question.question}
+            </h2>
 
             <div className="space-y-2 md:space-y-3 mb-5 md:mb-6">
               {question.options.map((option, index) => {
@@ -311,7 +339,7 @@ export default function QuizPage({ params }: { params: { id: string } }) {
                     onClick={() => handleAnswerSelect(index)}
                     disabled={showExplanation}
                     className={cn(
-                      "w-full p-3 md:p-4 text-left rounded-lg border-2 transition-all text-sm md:text-base",
+                      "w-full p-3 md:p-4 text-left rounded-lg border-2 transition-all text-sm sm:text-base",
                       "hover:border-primary disabled:cursor-not-allowed active:scale-[0.98]",
                       isSelected && !showExplanation && "border-primary bg-primary/5",
                       showCorrect && "border-secondary bg-secondary/10",
@@ -335,7 +363,7 @@ export default function QuizPage({ params }: { params: { id: string } }) {
                           <span className="text-xs font-semibold">{String.fromCharCode(65 + index)}</span>
                         )}
                       </div>
-                      <span className="text-pretty">{option}</span>
+                      <span className="text-pretty leading-relaxed">{option}</span>
                     </div>
                   </button>
                 )
@@ -350,11 +378,11 @@ export default function QuizPage({ params }: { params: { id: string } }) {
                   ) : (
                     <XCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
                   )}
-                  <div>
-                    <div className="text-sm md:text-base font-semibold mb-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm sm:text-base font-semibold mb-1">
                       {isCorrect ? "Correct!" : "Not quite right"}
                     </div>
-                    <p className="text-xs md:text-sm text-pretty">{question.explanation}</p>
+                    <p className="text-xs sm:text-sm text-pretty leading-relaxed">{question.explanation}</p>
                   </div>
                 </div>
               </Card>
