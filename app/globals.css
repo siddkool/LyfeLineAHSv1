@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+/* @import "tw-animate-css"; Temporarily removed tw-animate-css import to test if it's causing the CSS parsing error */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -75,73 +75,60 @@
 }
 
 @theme inline {
-  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  /* Removed var() references that were causing "Invalid custom property" errors */
+  /* @theme inline block must be self-contained with direct values only */
 
   --font-sans: "Inter", system-ui, sans-serif;
 
-  /* White background with green accents - no dark mode */
-  --color-primary: #2d5016; /* Dark swamp green - primary actions */
+  /* White background with green accents */
+  --color-primary: #2d5016;
   --color-primary-foreground: #ffffff;
 
-  --color-secondary: #4a7c2c; /* Medium forest green - secondary elements */
+  --color-secondary: #4a7c2c;
   --color-secondary-foreground: #ffffff;
 
-  --color-accent: #7cb342; /* Light green - highlights and accents */
+  --color-accent: #7cb342;
   --color-accent-foreground: #ffffff;
 
-  --color-background: #ffffff; /* Pure white background */
-  --color-foreground: #1a1a1a; /* Dark text for contrast */
+  --color-background: #ffffff;
+  --color-foreground: #1a1a1a;
 
-  --color-card: #ffffff; /* White cards */
+  --color-card: #ffffff;
   --color-card-foreground: #1a1a1a;
 
-  --color-muted: #f5f5f5; /* Very light gray for subtle backgrounds */
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1a1a1a;
+
+  --color-muted: #f5f5f5;
   --color-muted-foreground: #666666;
 
-  --color-border: #e0e0e0; /* Light gray borders */
+  --color-border: #e0e0e0;
   --color-input: #e0e0e0;
-  --color-ring: #4a7c2c; /* Green focus ring */
+  --color-ring: #4a7c2c;
 
-  --color-destructive: #dc2626; /* Red for errors */
+  --color-destructive: #dc2626;
   --color-destructive-foreground: #ffffff;
 
+  --color-chart-1: #f97316;
+  --color-chart-2: #3b82f6;
+  --color-chart-3: #8b5cf6;
+  --color-chart-4: #f59e0b;
+  --color-chart-5: #10b981;
+
   --radius: 0.75rem;
+  --radius-sm: calc(0.75rem - 4px);
+  --radius-md: calc(0.75rem - 2px);
+  --radius-lg: 0.75rem;
+  --radius-xl: calc(0.75rem + 4px);
+
+  --color-sidebar: #f5f5f5;
+  --color-sidebar-foreground: #1a1a1a;
+  --color-sidebar-primary: #2d5016;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #f5f5f5;
+  --color-sidebar-accent-foreground: #1a1a1a;
+  --color-sidebar-border: #e0e0e0;
+  --color-sidebar-ring: #4a7c2c;
 }
 
 /* Removed dark mode media query to keep white background always */
@@ -155,3 +142,5 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Removed unused caret-blink animation and utility class */

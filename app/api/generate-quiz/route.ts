@@ -1,4 +1,9 @@
+import { createGroq } from "@ai-sdk/groq"
 import { generateText } from "ai"
+
+const groq = createGroq({
+  apiKey: process.env.GROQ_API_KEY,
+})
 
 export async function POST(request: Request) {
   try {
@@ -8,7 +13,7 @@ export async function POST(request: Request) {
     console.log("[v0] Generating quiz for:", lessonTitle)
 
     const { text } = await generateText({
-      model: "openai/gpt-4o-mini",
+      model: groq("llama-3.3-70b-versatile"),
       prompt: `You are a quiz generator. Create a unique educational quiz about vaping.
 
 Lesson: ${lessonTitle}
