@@ -1,5 +1,5 @@
 @import "tailwindcss";
-/* @import "tw-animate-css"; Temporarily removed tw-animate-css import to test if it's causing the CSS parsing error */
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -75,45 +75,42 @@
 }
 
 @theme inline {
-  /* Removed var() references that were causing "Invalid custom property" errors */
-  /* @theme inline block must be self-contained with direct values only */
-
   --font-sans: "Inter", system-ui, sans-serif;
 
-  /* White background with green accents */
-  --color-primary: #2d5016;
+  /* Updated color scheme to match new Lifeline logo (bright green #00D66C and black on white) */
+  --color-primary: #00d66c;
   --color-primary-foreground: #ffffff;
 
-  --color-secondary: #4a7c2c;
+  --color-secondary: #000000;
   --color-secondary-foreground: #ffffff;
 
-  --color-accent: #7cb342;
+  --color-accent: #00d66c;
   --color-accent-foreground: #ffffff;
 
   --color-background: #ffffff;
-  --color-foreground: #1a1a1a;
+  --color-foreground: #000000;
 
   --color-card: #ffffff;
-  --color-card-foreground: #1a1a1a;
+  --color-card-foreground: #000000;
 
   --color-popover: #ffffff;
-  --color-popover-foreground: #1a1a1a;
+  --color-popover-foreground: #000000;
 
   --color-muted: #f5f5f5;
-  --color-muted-foreground: #666666;
+  --color-muted-foreground: #737373;
 
-  --color-border: #e0e0e0;
-  --color-input: #e0e0e0;
-  --color-ring: #4a7c2c;
+  --color-border: #e5e5e5;
+  --color-input: #e5e5e5;
+  --color-ring: #00d66c;
 
-  --color-destructive: #dc2626;
+  --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
 
-  --color-chart-1: #f97316;
-  --color-chart-2: #3b82f6;
-  --color-chart-3: #8b5cf6;
-  --color-chart-4: #f59e0b;
-  --color-chart-5: #10b981;
+  --color-chart-1: #00d66c;
+  --color-chart-2: #00b359;
+  --color-chart-3: #009946;
+  --color-chart-4: #008033;
+  --color-chart-5: #006620;
 
   --radius: 0.75rem;
   --radius-sm: calc(0.75rem - 4px);
@@ -121,21 +118,19 @@
   --radius-lg: 0.75rem;
   --radius-xl: calc(0.75rem + 4px);
 
-  --color-sidebar: #f5f5f5;
-  --color-sidebar-foreground: #1a1a1a;
-  --color-sidebar-primary: #2d5016;
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #000000;
+  --color-sidebar-primary: #00d66c;
   --color-sidebar-primary-foreground: #ffffff;
   --color-sidebar-accent: #f5f5f5;
-  --color-sidebar-accent-foreground: #1a1a1a;
-  --color-sidebar-border: #e0e0e0;
-  --color-sidebar-ring: #4a7c2c;
+  --color-sidebar-accent-foreground: #000000;
+  --color-sidebar-border: #e5e5e5;
+  --color-sidebar-ring: #00d66c;
 }
-
-/* Removed dark mode media query to keep white background always */
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
@@ -143,4 +138,34 @@
   }
 }
 
-/* Removed unused caret-blink animation and utility class */
+/* Removed gradient utilities, updated to clean green/black theme */
+@layer utilities {
+  .text-gradient-lifeline {
+    color: #00d66c;
+  }
+
+  .shadow-lifeline {
+    box-shadow: 0 10px 40px -10px rgba(0, 214, 108, 0.2);
+  }
+
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 48px -12px rgba(0, 214, 108, 0.25);
+  }
+
+  .border-lifeline {
+    border-color: #00d66c;
+  }
+
+  .bg-lifeline {
+    background-color: #00d66c;
+  }
+
+  .bg-lifeline-soft {
+    background-color: rgba(0, 214, 108, 0.05);
+  }
+}

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { LESSONS } from "@/lib/lessons-data"
 import { useUserProgress } from "@/lib/hooks/use-user-progress"
 import { Navigation } from "@/components/navigation"
-import { BookOpen, Clock, Trophy, Search, CheckCircle2 } from "lucide-react"
+import { BookOpen, Clock, Trophy, Search, CheckCircle2, Sparkles } from "lucide-react"
 import { getRankInfo } from "@/lib/utils/ranks"
 
 const CATEGORIES = [
@@ -45,13 +45,13 @@ export default function LessonsPage() {
   const rankInfo = getRankInfo(totalPoints)
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
+    <div className="min-h-screen bg-white pb-20 md:pb-0">
       {/* Header */}
-      <div className="border-b bg-card shadow-sm">
+      <div className="border-b bg-lifeline-soft shadow-sm">
         <div className="container mx-auto px-4 py-4 md:py-6">
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Lessons</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-lifeline">Lessons</h1>
               <p className="text-sm md:text-base text-muted-foreground mt-1">Learn about vaping and earn points</p>
             </div>
           </div>
@@ -59,22 +59,28 @@ export default function LessonsPage() {
           {/* Stats */}
           {!isLoading && (
             <div className="grid grid-cols-3 gap-3 md:gap-4">
-              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center shadow-md hover:shadow-lg transition-shadow">
-                <CheckCircle2 className="w-8 h-8 md:w-10 md:h-10 text-green-600 mb-2" />
+              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center hover-lift border-2 border-border hover:border-lifeline transition-colors">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-lifeline flex items-center justify-center mb-2 shadow-lifeline">
+                  <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                </div>
                 <div className="text-xs md:text-sm text-muted-foreground mb-1">Completed</div>
-                <div className="text-xl md:text-2xl font-bold">
+                <div className="text-xl md:text-2xl font-bold text-lifeline">
                   {completedCount}/{LESSONS.length}
                 </div>
               </Card>
 
-              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center shadow-md hover:shadow-lg transition-shadow">
-                <Trophy className="w-8 h-8 md:w-10 md:h-10 text-amber-500 mb-2" />
+              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center hover-lift border-2 border-border hover:border-lifeline transition-colors">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-secondary flex items-center justify-center mb-2 shadow-lg">
+                  <Trophy className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                </div>
                 <div className="text-xs md:text-sm text-muted-foreground mb-1">Total Points</div>
-                <div className="text-xl md:text-2xl font-bold text-amber-600">{totalPoints}</div>
+                <div className="text-xl md:text-2xl font-bold text-secondary">{totalPoints}</div>
               </Card>
 
-              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-2xl md:text-3xl mb-1">{rankInfo.icon}</div>
+              <Card className="p-4 md:p-5 flex flex-col items-center justify-center text-center hover-lift border-2 border-border hover:border-lifeline transition-colors">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-lifeline flex items-center justify-center mb-2 shadow-lifeline">
+                  <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                </div>
                 <div className="text-xs md:text-sm text-muted-foreground mb-1">Rank</div>
                 <div className={`text-lg md:text-xl font-bold ${rankInfo.color}`}>{rankInfo.rank}</div>
               </Card>
@@ -92,7 +98,7 @@ export default function LessonsPage() {
               placeholder="Search lessons..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 focus:ring-2 focus:ring-lifeline/20 focus:border-lifeline"
             />
           </div>
         </div>
@@ -105,7 +111,11 @@ export default function LessonsPage() {
               variant={selectedCategory === category.id ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(category.id)}
-              className="flex-shrink-0"
+              className={`flex-shrink-0 ${
+                selectedCategory === category.id
+                  ? "bg-lifeline hover:bg-lifeline/90"
+                  : "hover:border-lifeline hover:bg-lifeline-soft"
+              }`}
             >
               {category.label}
             </Button>
@@ -120,15 +130,23 @@ export default function LessonsPage() {
 
             return (
               <Link key={lesson.id} href={`/lessons/${lesson.id}`}>
-                <Card className="p-5 md:p-6 h-full flex flex-col gap-3 md:gap-4 hover:shadow-lg transition-shadow cursor-pointer">
+                <Card
+                  className={`p-5 md:p-6 h-full flex flex-col gap-3 md:gap-4 hover-lift cursor-pointer border-2 transition-colors ${
+                    isCompleted ? "border-lifeline bg-lifeline-soft" : "border-border hover:border-lifeline"
+                  }`}
+                >
                   <div className="flex items-start justify-between gap-2">
                     <Badge className={DIFFICULTY_COLORS[lesson.difficulty]}>{lesson.difficulty}</Badge>
-                    {isCompleted && <CheckCircle2 className="w-5 h-5 text-secondary flex-shrink-0" />}
+                    {isCompleted && (
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30">
+                        <CheckCircle2 className="w-4 h-4 text-white" />
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex-1">
                     <h3 className="text-base md:text-lg font-semibold mb-2 text-balance">{lesson.title}</h3>
-                    <p className="text-sm text-muted-foreground text-pretty">{lesson.description}</p>
+                    <p className="text-sm text-muted-foreground text-pretty leading-relaxed">{lesson.description}</p>
                   </div>
 
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -137,14 +155,14 @@ export default function LessonsPage() {
                       <span>{lesson.estimatedMinutes} min</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Trophy className="w-4 h-4" />
-                      <span>{lesson.pointsReward} pts</span>
+                      <Trophy className="w-4 h-4 text-amber-500" />
+                      <span className="font-semibold text-amber-600">{lesson.pointsReward} pts</span>
                     </div>
                   </div>
 
                   {isCompleted && score && (
-                    <div className="pt-3 border-t">
-                      <div className="text-sm font-medium">
+                    <div className="pt-3 border-t border-lifeline/20">
+                      <div className="text-sm font-medium text-lifeline">
                         Quiz Score: {Math.round((score.score / score.total) * 100)}%
                       </div>
                     </div>

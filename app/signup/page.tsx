@@ -72,10 +72,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <Card className="w-full max-w-md p-8 border-2">
         <div className="flex flex-col items-center gap-6 mb-8">
-          <Image src="/lyfeline-logo.png" alt="Lyfeline" width={240} height={80} className="w-60 h-auto" priority />
+          <Image src="/lifeline-logo-new.png" alt="Lifeline" width={300} height={90} className="w-72 h-auto" priority />
           <div className="text-center">
             <h2 className="text-2xl font-semibold">Create Account</h2>
             <p className="text-muted-foreground mt-1">Start your vape education journey today</p>
@@ -160,14 +160,14 @@ export default function SignupPage() {
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full bg-lifeline hover:bg-lifeline/90" disabled={loading}>
             {loading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
 
         <div className="mt-6 text-center text-sm">
           <span className="text-muted-foreground">Already have an account? </span>
-          <Link href="/login" className="text-primary hover:underline font-medium">
+          <Link href="/login" className="text-lifeline hover:underline font-medium">
             Sign in
           </Link>
         </div>
